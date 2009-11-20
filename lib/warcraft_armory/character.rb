@@ -109,6 +109,7 @@ module WarcraftArmory
     #  # => <WarcraftArmory::Character>
     def self.find(location, realm, character)
       result = WarcraftArmory::Character.new
+      # save the location as locale for fetching of other armory data
       result.locale = location
       
       url = WarcraftArmory::Base.generate_url(location, realm, character, CONFIG["file"])
@@ -122,9 +123,46 @@ module WarcraftArmory
     end    
   end
 
+  # Gives you access to Arena Team information
+  #
+  # ==== Available Attributes
+  # * <tt>name</tt> - The name of the team
+  # * <tt>rating</tt> - The current rating of the team, anywhere from 0 to 3000
+  # * <tt>ranking</tt> - Battlegroup ranking for the team.
+  # * <tt>season_games_played</tt> - Total games played by the team in the current arena season
+  # * <tt>season_games_won</tt> - Total games won by the team in the current arena season
+  # * <tt>last_season_ranking</tt> - Final ranking of the team from the previous arena season
+  # * <tt>size</tt> - Number of members on the team.
+  # * <tt>team_size</tt> - Team size bracket that this team belongs to, e.g. 2, 3, or 5
+  # * <tt>battlegroup</tt> - String representation of the name of the battlegroup this team is on
+  # * <tt>faction_id</tt> - The internal (World of Warcraft) id for the faction.
+  # * <tt>faction</tt> - Faction that players on this arena team belong to, e.g. "Alliance" or "Horde"
+  # * <tt>realm</tt> - Realm that this arena team is on
+  # * <tt>created</tt> - When this team was created, as a timestamp stored in a string.
+  #
+  # ==== Available helper methods
+  # * <tt>season_record</tt> - A formatted string of <tt>season_games_won</tt> and <tt>season_games_played</tt>
+  # * <tt>season_win_percentage</tt> - A whole integer representation of number of games won divided by games played.
+  #
+  # ==== Examples
+  #   character = WarcraftArmory::Character.find(:us, :whisperwind, :hightops)
+  #   # => <WarcraftArmory::Character>
+  #
+  #   character.arena_teams
+  #   # => { :twos => #<WarcraftArmory::ArenaTeam>,
+  #   #      :threes => #<WarcraftArmory::ArenaTeam>,
+  #   #      :fives => #<WarcraftArmory::ArenaTeam> }
+  #
+  #   character.arena_teams[:twos].rating
+  #   # => 1204
+  #
+  #   character.arena_teams[:twos].ranking
+  #   # => 6239
+  #
+  #   character.arena_teams[:twos].name
+  #   # => "Orange Team"
+  #
   class ArenaTeam
-    attr_accessor :size, :members, :games_played
-
     CONFIG_ARENA["attributes"].each_pair do |key, value|
       attr_accessor "#{key}".to_sym
     end
@@ -134,7 +172,10 @@ module WarcraftArmory
     end
 
     def season_win_percentage
-      (season_games_won / season_games_played.to_f*100).to_i
+      if season_games_played == 0
+        return 0
+      end
+      return (season_games_won / season_games_played.to_f*100).to_i
     end
   end
 end
