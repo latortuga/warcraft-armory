@@ -1,0 +1,11 @@
+arena_teams:
+  file: "character-arenateams.xml"
+  attributes:
+    name: '(doc/"arenaTeam[@teamSize=:size]").first["name"]'
+    rating: '(doc/"arenaTeam[@teamSize=:size]").first["rating"].to_i'
+    ranking: '(doc/"arenaTeam[@teamSize=:size]").first["ranking"].to_i'
+    season_games_played: '(doc/"arenaTeam[@teamSize=:size]").first["seasonGamesPlayed"].to_i'
+    season_games_won: '(doc/"arenaTeam[@teamSize=:size]").first["seasonGamesWon"].to_i'
+    last_season_ranking: '(doc/"arenaTeam[@teamSize=:size]").first["lastSeasonRanking"].to_i'
+    member_count: '(doc/"arenaTeam[@teamSize=:size]").first["size"].to_i'
+    battlegroup: '(doc/"arenaTeam[@teamSize=:size]").first["battleGroup"]'
